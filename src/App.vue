@@ -43,11 +43,13 @@ export default Vue.extend({
 
 <style>
 * {
+  @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");
+  font-family: "Poppins", sans-serif;
   box-sizing: border-box;
   padding: 0;
   margin: 0;
 }
 #app {
-  background: #b8b8b8;
+  background: #92919170;
 }
 </style>

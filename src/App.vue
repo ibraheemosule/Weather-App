@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Layout :data="data" />
+    <Layout :data="data" :city="location" :fetching="isFetching" @fetch="fetch" />
   </div>
 </template>
 
@@ -17,25 +17,40 @@ export default Vue.extend({
   setup() {
     const apiKey: number = process.env.VUE_APP_API_KEY;
     const state = reactive({
-      location: "Lagos",
-      count: 100,
+      location: "",
       data: {},
+      isFetching: false,
     } as {
       location: string;
       count: number;
-      data: Record<string, unknown>;
+      data: Record<string, unknown>[];
+      isFetching: boolean;
     });
 
-    (async () => {
-      const { data } = await axios.get(
-        `https://api.openweathermap.org/data/2.5/forecast?q=${state.location}&units=metric&cnt=${state.count}&appid=${apiKey}`
-      );
-      state.data = await data;
-      console.log(state.data);
-    })();
+    const fetch = async (location: string) => {
+       state.isFetching = !state.isFetching;
+      try {
+        const { data } = await axios.get(
+          `https://api.openweathermap.org/data/2.5/forecast?q=${location}&units=metric&cnt=40&appid=${apiKey}`
+        );
+
+        if(await data) {
+          state.isFetching = !state.isFetching;
+        }
+        state.location = data?.city.name;
+        state.data = await data?.list.filter(
+          (_val: any, i: number) => i % 8 === 0
+        );
+      } catch (err) {
+        console.log(err);
+         state.isFetching = !state.isFetching;
+      }
+    };
+    fetch("Lagos");
 
     return {
       ...toRefs(state),
+      fetch,
     };
   },
 });

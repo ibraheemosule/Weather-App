@@ -11,11 +11,7 @@
           <img class="logo" src="@/assets/images/logo.png" alt="rainy gif" />
           <span> Weather App </span>
         </div>
-        <img
-          class="image"
-          src="@/assets/images/unknown.gif"
-          alt="weather image"
-        />
+        <img class="image" :src="imgUrl(image)" alt="weather image" />
       </template>
       <section class="hero">
         <div class="weather" v-if="list">

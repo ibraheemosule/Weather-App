@@ -12,7 +12,17 @@
 <script lang="ts">
   import Vue from "vue";
   import axios from "axios";
+  import { getPosition, fetchWeather } from "./assets/functions/functions";
   import { reactive, toRefs } from "@vue/composition-api";
+
+  interface Geo {
+    [value: string]: any;
+    coords: {
+      [value: string]: any;
+      longitude: number;
+      latitude: number;
+    };
+  }
 
   export default Vue.extend({
     name: "App",
@@ -32,24 +42,40 @@
         isFetching: boolean;
       });
 
-      const fetch = async (location: string) => {
+      (() => {
         state.isFetching = !state.isFetching;
-        try {
-          const { data } = await axios.get(
-            `https://api.openweathermap.org/data/2.5/forecast?q=${location}&units=metric&cnt=40&appid=${apiKey}`
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            async position => {
+              try {
+                const data: any = await getPosition(position);
+                fetch(data);
+              } catch (err) {
+                console.log(err);
+              }
+            },
+            error => {
+              state.isFetching = !state.isFetching;
+              console.log(error.message);
+            }
           );
+        } else {
+          state.isFetching = !state.isFetching;
+        }
+      })();
 
-          if (await data) {
-            state.isFetching = !state.isFetching;
-          }
+      const fetch = async (location: string) => {
+        if (!state.isFetching) state.isFetching = !state.isFetching;
+        try {
+          const data = await fetchWeather(location);
           state.location = data?.city.name;
           state.data = data.list.filter((_val: any, i: number) => i % 8 === 0);
         } catch (err) {
           console.log(err);
+        } finally {
           state.isFetching = !state.isFetching;
         }
       };
-      fetch("dubai");
 
       return {
         ...toRefs(state),

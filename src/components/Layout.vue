@@ -6,7 +6,7 @@
           <Loader />
         </div>
       </template>
-      <template v-once>
+      <template>
         <div class="title">
           <img class="logo" src="@/assets/images/logo.png" alt="rainy gif" />
           <span> Weather App </span>
@@ -14,7 +14,7 @@
         <img class="image" :src="imgUrl(image)" alt="weather image" />
       </template>
       <section class="hero">
-        <div class="weather" v-if="list">
+        <div class="weather" v-if="city">
           <h1>{{ Math.round(list.main.temp) }}&#176;</h1>
 
           <div class="info">
@@ -31,7 +31,7 @@
           </div>
         </div>
         <div v-else class="error">
-          <template v-if="!location">
+          <template v-if="!fetching">
             Error! Check Your Connection or Location Name
           </template>
         </div>
@@ -40,7 +40,7 @@
         <form @submit.prevent="fetchData" class="search-field">
           <div class="input-wrapper">
             <input
-              maxlength="20"
+              maxlength="30"
               v-model="location"
               type="text"
               placeholder="Type Location"
@@ -160,14 +160,13 @@
               break;
 
             default:
-              console.log(state.image, "default");
               state.image = "unknown";
           }
-          console.log(state.image, newValue, "it has changed");
         }
       );
 
-      const imgUrl = (img: string) => `@/assets/images/${img}.gif`;
+      const imgUrl = (img: string): string =>
+        require(`@/assets/images/${img}.gif`);
 
       // const getImgUrl = (pet: string) => {
       //   var images = require.context("../assets/", false, /\.gif$/);

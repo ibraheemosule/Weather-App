@@ -31,7 +31,7 @@
           </div>
         </div>
         <div v-else class="error">
-          <template v-if="!fetching">
+          <template v-if="!fetching && !location">
             Error! Check Your Connection or Location Name
           </template>
         </div>
@@ -137,6 +137,7 @@
       watch(
         () => state.list?.weather[0].main,
         newValue => {
+          console.log(state.list, "wather");
           switch (newValue) {
             case "Thunderstorm":
               state.image = newValue;
@@ -168,12 +169,6 @@
       const imgUrl = (img: string): string =>
         require(`@/assets/images/${img}.gif`);
 
-      // const getImgUrl = (pet: string) => {
-      //   var images = require.context("../assets/", false, /\.gif$/);
-      //   console.log(images("./" + pet + ".gif"));
-      //   return images("./" + pet + ".gif");
-      // };
-
       const activeButton = (e: any): void => {
         const allButtons = document.querySelectorAll(".btn-group button");
         for (let button of allButtons) {
@@ -186,7 +181,6 @@
       };
 
       const dayCalc = (): void => {
-        console.log(props.fetching);
         let date = new Date();
         state.day = date.getDay();
         const arr = [];

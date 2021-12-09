@@ -21,7 +21,7 @@
             <div>
               <h2>{{ city }}</h2>
               <div class="time">
-                {{ time }}
+                {{ getTime() }}
               </div>
             </div>
             <div v-if="list" class="condition">
@@ -48,9 +48,9 @@
           </div>
           <button><ion-icon name="search-outline"></ion-icon></button>
         </form>
-        <ul class="locations">
-          <li v-for="day in dayValues" :key="day.day">{{ day.day }}</li>
-        </ul>
+        <div class="locations">
+          <Suggestions @fetch="fetchData" :inputValue="location" />
+        </div>
         <aside>
           <div class="btn-group">
             <button
@@ -84,10 +84,10 @@
 </template>
 
 <script lang="ts">
-  // 52070369
-
+  /* eslint-disable */
   import Vue from "vue";
   import { reactive, computed, toRefs, watch } from "@vue/composition-api";
+  import Suggestions from "./Suggestions.vue";
 
   interface IProps {
     [key: string]: any;
@@ -96,8 +96,9 @@
   export default Vue.extend({
     components: {
       Loader: () => import("./Loader.vue"),
+      Suggestions: () => import("./Suggestions.vue"),
     },
-    props: ["data", "city", "fetching"],
+    props: ["data", "city", "fetching", "timezone"],
     setup(props: IProps, { emit }) {
       const days = [
         {
@@ -128,16 +129,41 @@
         day: 0,
         dayValues: [],
         location: "",
+        cityTime: "",
         image: "unknown",
         list: computed(() => {
           return props?.data[state.value];
         }),
       });
 
+      const getTime = () => {
+        const date: Date = new Date();
+        date.setMinutes(
+          date.getMinutes() + date.getTimezoneOffset() + props.timezone / 60
+        );
+
+        let hours = date.getHours(),
+          minutes = date.getMinutes(),
+          day = date.getDate(),
+          month = date.getMonth(),
+          year = date.getFullYear().toString().slice(-2);
+
+        return `${
+          hours < 12
+            ? hours.toString().length < 2
+              ? "0" + hours
+              : hours
+            : (hours - 12).toString().length < 2
+            ? "0" + (hours - 12)
+            : hours - 12
+        } ${minutes < 10 ? "0" + minutes : minutes} ${
+          hours > 11 ? "PM" : "AM"
+        } - ${day} '${month + 1} '${year}`;
+      };
+
       watch(
         () => state.list?.weather[0].main,
         newValue => {
-          console.log(state.list, "wather");
           switch (newValue) {
             case "Thunderstorm":
               state.image = newValue;
@@ -176,12 +202,14 @@
         }
         e.target.classList.add("btn-active");
         state.value = parseInt(e.target.id);
-        // console.log(state.value);
         dayCalc();
       };
 
       const dayCalc = (): void => {
         let date = new Date();
+        date.setMinutes(
+          date.getMinutes() + date.getTimezoneOffset() + props.timezone / 60
+        );
         state.day = date.getDay();
         const arr = [];
         for (let i = state.day; i < 8; i++) {
@@ -196,12 +224,9 @@
           .toLocaleTimeString()
           .split(":")
           .slice(0, 2)
-          .join(":")} ${
-          date.getHours() < 12 ? "AM" : "PM"
-        } - ${date.getDate()} '${date.getMonth() + 1} '${date
-          .getFullYear()
-          .toString()
-          .slice(-2)}`;
+          .join(":")} ${date.getHours()} - ${date.getDate()} '${
+          date.getMonth() + 1
+        } '${date.getFullYear().toString().slice(-2)}`;
       };
       dayCalc();
 
@@ -216,6 +241,7 @@
         fetchData,
         days,
         imgUrl,
+        getTime,
       };
     },
   });
@@ -295,7 +321,12 @@
     color: rgba(255, 0, 0, 0.61);
     text-align: center;
     line-height: 2.5rem;
-    margin: 100% 0.5rem 0;
+    margin: 0 0.5rem 0 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
   }
 
   .info .time {
@@ -371,14 +402,14 @@
     border-left-color: #1d1dfa3f;
     border-top-color: #1d1dfa3f;
   }
-  .details ul {
-    list-style-type: none;
-    margin: 30px 0;
-  }
-  .details .locations li {
-    margin: 10px 0;
+  .details .locations {
+    margin: 0 0 30px 0;
     font-size: 0.8em;
   }
+  /* .details .locations div {
+    margin: 10px 0;
+
+  } */
 
   aside .btn-group {
     display: flex;
@@ -445,11 +476,6 @@
     }
     .hero .error {
       margin: 0;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 100%;
     }
     .wrapper .image {
       height: 100%;

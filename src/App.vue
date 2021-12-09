@@ -5,24 +5,16 @@
       :city="location"
       :fetching="isFetching"
       @fetch="fetch"
+      :timezone="timezone"
     />
   </div>
 </template>
 
 <script lang="ts">
+  /* eslint-disable */
   import Vue from "vue";
-  import axios from "axios";
   import { getPosition, fetchWeather } from "./assets/functions/functions";
   import { reactive, toRefs } from "@vue/composition-api";
-
-  interface Geo {
-    [value: string]: any;
-    coords: {
-      [value: string]: any;
-      longitude: number;
-      latitude: number;
-    };
-  }
 
   export default Vue.extend({
     name: "App",
@@ -35,11 +27,13 @@
         location: "",
         data: {},
         isFetching: false,
+        timezone: "",
       } as {
         location: string;
         count: number;
         data: Record<string, unknown>[];
         isFetching: boolean;
+        timezone: number | string;
       });
 
       (() => {
@@ -69,6 +63,7 @@
         try {
           const data = await fetchWeather(location);
           state.location = data?.city.name;
+          state.timezone = data?.city.timezone;
           state.data = data.list.filter((_val: any, i: number) => i % 8 === 0);
         } catch (err) {
           console.log(err);

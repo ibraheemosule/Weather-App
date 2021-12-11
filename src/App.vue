@@ -14,6 +14,7 @@
   /* eslint-disable */
   import Vue from "vue";
   import { getPosition, fetchWeather } from "./assets/functions/functions";
+  import { IWeatherData } from "./assets/types/types";
   import { reactive, toRefs } from "@vue/composition-api";
 
   export default Vue.extend({
@@ -31,7 +32,8 @@
       } as {
         location: string;
         count: number;
-        data: Record<string, unknown>[];
+        data: IWeatherData;
+        // data: Record<string, unknown>[];
         isFetching: boolean;
         timezone: number | string;
       });

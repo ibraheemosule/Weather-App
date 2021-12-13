@@ -86,19 +86,23 @@
 <script lang="ts">
   /* eslint-disable */
   import Vue from "vue";
-  import { reactive, computed, toRefs, watch } from "@vue/composition-api";
-  import Suggestions from "./Suggestions.vue";
-
-  interface IProps {
-    [key: string]: any;
-  }
+  import {
+    reactive,
+    computed,
+    toRefs,
+    watch,
+    PropType,
+  } from "@vue/composition-api";
+  import { IWeatherList, IProps } from "../assets/types/types";
 
   export default Vue.extend({
     components: {
       Loader: () => import("./Loader.vue"),
       Suggestions: () => import("./Suggestions.vue"),
     },
+
     props: ["data", "city", "fetching", "timezone"],
+
     setup(props: IProps, { emit }) {
       const days = [
         {
@@ -131,8 +135,8 @@
         location: "",
         cityTime: "",
         image: "unknown",
-        list: computed(() => {
-          return props?.data[state.value];
+        list: computed((): IWeatherList => {
+          return props.data && props?.data[state.value];
         }),
       });
 
@@ -142,11 +146,11 @@
           date.getMinutes() + date.getTimezoneOffset() + props.timezone / 60
         );
 
-        let hours = date.getHours(),
-          minutes = date.getMinutes(),
-          day = date.getDate(),
-          month = date.getMonth(),
-          year = date.getFullYear().toString().slice(-2);
+        let hours: number = date.getHours(),
+          minutes: number = date.getMinutes(),
+          day: number = date.getDate(),
+          month: number = date.getMonth(),
+          year: string = date.getFullYear().toString().slice(-2);
 
         return `${
           hours < 12
@@ -156,9 +160,9 @@
             : (hours - 12).toString().length < 2
             ? "0" + (hours - 12)
             : hours - 12
-        } ${minutes < 10 ? "0" + minutes : minutes} ${
+        }:${minutes < 10 ? "0" + minutes : minutes} ${
           hours > 11 ? "PM" : "AM"
-        } - ${day} '${month + 1} '${year}`;
+        } - ${day}/${month + 1}/${year}`;
       };
 
       watch(

@@ -7,6 +7,12 @@
       <li @click="fetchData(returnValues[3])" class="value"></li>
       <li @click="fetchData(returnValues[4])" class="value"></li>
     </template>
+    <template v-if="!inputValue && locationDetails.country">
+      <li class="details">
+        <h1>Country: {{ locationDetails.country }}</h1>
+        <h1>Population: {{ locationDetails.population }}</h1>
+      </li>
+    </template>
   </ul>
 </template>
 
@@ -14,11 +20,8 @@
   /* eslint-disable */
   import Vue from "vue";
   import { locations } from "../assets/functions/functions";
-  import { reactive, computed, toRefs, watch } from "@vue/composition-api";
-
-  interface IProps {
-    [key: string]: any;
-  }
+  import { reactive, toRefs, watch, inject } from "@vue/composition-api";
+  import { IProps } from "../assets/types/types";
 
   export default Vue.extend({
     props: ["inputValue"],
@@ -27,14 +30,13 @@
         places: [],
         returnValues: [],
         displayValues: [],
-        data: computed(() => {
-          return "null";
-        }),
       });
 
       (async () => {
         state.places = await locations();
       })();
+
+      const locationDetails = inject("locationInfo");
 
       watch(
         () => props.inputValue,
@@ -64,9 +66,10 @@
             let doc = parser.parseFromString(val, "text/html");
             return doc.body;
           });
-          state.displayValues.forEach((val: Document, i: number) =>
-            document.getElementsByClassName("value")[i].appendChild(val)
-          );
+          state.displayValues.forEach((val: Document, i: number) => {
+            if (props.inputValue)
+              document.getElementsByClassName("value")[i].appendChild(val);
+          });
         }
       );
       const fetchData = (value: string) => {
@@ -76,6 +79,7 @@
       return {
         ...toRefs(state),
         fetchData,
+        locationDetails,
       };
     },
   });
@@ -89,12 +93,21 @@
     display: flex;
     flex-direction: column;
     padding-right: 2rem;
+    position: relative;
   }
   ul li {
     margin: 10px 0;
+    max-width: max-content;
   }
-  li:hover {
+  li.value:hover {
     color: rgba(57, 57, 255, 0.712);
     cursor: pointer;
+  }
+  ul .details {
+    margin: 50px 0;
+  }
+  .details h1 {
+    margin: 10px 0;
+    color: rgba(255, 255, 255, 0.699);
   }
 </style>

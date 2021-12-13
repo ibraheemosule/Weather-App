@@ -14,8 +14,8 @@
   /* eslint-disable */
   import Vue from "vue";
   import { getPosition, fetchWeather } from "./assets/functions/functions";
-  import { IWeatherData } from "./assets/types/types";
-  import { reactive, toRefs } from "@vue/composition-api";
+  import { IWeatherData, IWeatherList } from "./assets/types/types";
+  import { reactive, toRefs, provide } from "@vue/composition-api";
 
   export default Vue.extend({
     name: "App",
@@ -26,18 +26,26 @@
       const apiKey: number = process.env.VUE_APP_API_KEY;
       const state = reactive({
         location: "",
-        data: {},
+        data: [],
         isFetching: false,
-        timezone: "",
+        timezone: 0,
+        locationDetails: {
+          country: "",
+          population: NaN,
+        },
       } as {
-        location: string;
-        count: number;
-        data: IWeatherData;
+        location: string | undefined;
+        data: IWeatherList[] | undefined;
+        locationDetails: {
+          country: string | undefined;
+          population: number | undefined;
+        };
         // data: Record<string, unknown>[];
         isFetching: boolean;
-        timezone: number | string;
+        timezone: number | undefined;
       });
 
+      provide("locationInfo", state.locationDetails);
       (() => {
         state.isFetching = !state.isFetching;
         if (navigator.geolocation) {
@@ -62,11 +70,16 @@
 
       const fetch = async (location: string) => {
         if (!state.isFetching) state.isFetching = !state.isFetching;
+
         try {
-          const data = await fetchWeather(location);
+          const data: IWeatherData | undefined = await fetchWeather(location);
           state.location = data?.city.name;
           state.timezone = data?.city.timezone;
-          state.data = data.list.filter((_val: any, i: number) => i % 8 === 0);
+          (state.locationDetails.country = data?.city.country),
+            (state.locationDetails.population = data?.city.population),
+            (state.data = data?.list.filter(
+              (_val: any, i: number) => i % 8 === 0
+            ));
         } catch (err) {
           console.log(err);
         } finally {

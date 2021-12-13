@@ -1,7 +1,13 @@
 /* eslint @typescript-eslint/no-var-requires: "off" */
 
 import axios from "axios";
-import { ICities, IWeatherData, ICountryCity, ILocation } from "../types/types";
+import {
+  ICities,
+  IWeatherData,
+  ICountryCity,
+  ILocation,
+  IWeatherList,
+} from "../types/types";
 const cities: ICities[] = require("cities.json");
 
 export const getPosition: PositionCallback = async (
@@ -18,7 +24,9 @@ export const getPosition: PositionCallback = async (
   }
 };
 
-export const fetchWeather = async (location: string) => {
+export const fetchWeather = async (
+  location: string
+): Promise<IWeatherData | undefined> => {
   try {
     const { data }: { data: IWeatherData } = await axios.get(
       `https://api.openweathermap.org/data/2.5/forecast?q=${location}&units=metric&cnt=40&appid=${process.env.VUE_APP_API_KEY}`

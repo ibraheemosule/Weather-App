@@ -70,3 +70,9 @@ export interface ILocation {
     data: ILocationData[];
   };
 }
+
+//PROPS
+
+export interface IProps {
+  [key: string]: any;
+}

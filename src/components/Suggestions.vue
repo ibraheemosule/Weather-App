@@ -67,7 +67,7 @@
             return doc.body;
           });
           state.displayValues.forEach((val: Document, i: number) => {
-            if (props.inputValue)
+            if (props.inputValue.length > 1)
               document.getElementsByClassName("value")[i].appendChild(val);
           });
         }

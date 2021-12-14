@@ -1,24 +1,17 @@
 /* eslint @typescript-eslint/no-var-requires: "off" */
 
 import axios from "axios";
-import {
-  ICities,
-  IWeatherData,
-  ICountryCity,
-  ILocation,
-  IWeatherList,
-} from "../types/types";
+import { ICities, IWeatherData, ICountryCity, ILocation } from "../types/types";
 const cities: ICities[] = require("cities.json");
 
 export const getPosition: PositionCallback = async (
   position: GeolocationPosition
 ) => {
   try {
-    const fetchLocation: ILocation = await axios.get(
-      `http://api.positionstack.com/v1/reverse?access_key=${process.env.VUE_APP_MAP_KEY}&query=${position.coords.latitude},${position.coords.longitude}`
+    const { data } = await axios.get(
+      `https://us1.locationiq.com/v1/reverse.php?key=${process.env.VUE_APP_MAP_KEY}&lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`
     );
-
-    return fetchLocation.data.data[0].locality;
+    return data.address.suburb || data.address.county || data.address.city;
   } catch (err) {
     console.error(err);
   }

@@ -41,9 +41,10 @@
           <div class="input-wrapper">
             <input
               maxlength="30"
-              v-model="location"
               type="text"
               placeholder="Type Location"
+              :value="location"
+              @input="evt => (location = evt.target.value)"
             />
           </div>
           <button><ion-icon name="search-outline"></ion-icon></button>
@@ -239,6 +240,11 @@
         state.location = "";
       };
 
+      const compositionUpdate = (event: InputEvent) => {
+        state.location = event.data;
+        console.log(event.data, "working hre");
+      };
+
       return {
         ...toRefs(state),
         activeButton,
@@ -246,6 +252,7 @@
         days,
         imgUrl,
         getTime,
+        compositionUpdate,
       };
     },
   });

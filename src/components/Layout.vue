@@ -37,7 +37,7 @@
         </div>
       </section>
       <section class="details">
-        <form @submit.prevent="fetchData" class="search-field">
+        <form @submit.prevent="fetchData(location)" class="search-field">
           <div class="input-wrapper">
             <input
               maxlength="30"
@@ -235,8 +235,8 @@
       };
       dayCalc();
 
-      const fetchData = () => {
-        emit("fetch", state.location);
+      const fetchData = (payload: string) => {
+        emit("fetch", payload);
         state.location = "";
       };
 

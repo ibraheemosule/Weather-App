@@ -72,8 +72,8 @@
           });
         }
       );
-      const fetchData = (value: string) => {
-        emit("fetch", value);
+      const fetchData = (payload: string) => {
+        emit("fetch", payload);
       };
 
       return {

@@ -32,7 +32,7 @@
         </div>
         <div v-else class="error">
           <template v-if="!fetching && !location">
-            Error! Check Your Connection or Location Name
+            Error! Location not found
           </template>
         </div>
       </section>
@@ -264,6 +264,9 @@
     height: 100vh;
     padding: 7% 5%;
     overflow-y: scroll;
+    width: 100%;
+    max-width: 1340px;
+    margin: 0 auto;
   }
   main div.wrapper {
     display: flex;

@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/no-var-requires: "off" */
 
 import axios from "axios";
-import { ICities, IWeatherData, ICountryCity, ILocation } from "../types/types";
+import { ICities, IWeatherData, ICountryCity } from "../types/types";
 const cities: ICities[] = require("cities.json");
 
 export const getPosition: PositionCallback = async (
@@ -11,7 +11,11 @@ export const getPosition: PositionCallback = async (
     const { data } = await axios.get(
       `https://us1.locationiq.com/v1/reverse.php?key=${process.env.VUE_APP_MAP_KEY}&lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`
     );
-    return data.address.suburb || data.address.county || data.address.city;
+
+    const location =
+      data.address.suburb || data.address.county || data.address.city;
+
+    return location[location.length - 1];
   } catch (err) {
     console.error(err);
   }

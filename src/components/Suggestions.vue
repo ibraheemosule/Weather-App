@@ -1,18 +1,18 @@
 <template>
   <ul>
-    <template v-if="inputValue">
-      <li @click="fetchData(returnValues[0])" class="value"></li>
-      <li @click="fetchData(returnValues[1])" class="value"></li>
-      <li @click="fetchData(returnValues[2])" class="value"></li>
-      <li @click="fetchData(returnValues[3])" class="value"></li>
-      <li @click="fetchData(returnValues[4])" class="value"></li>
-    </template>
-    <template v-if="!inputValue && locationDetails.country">
-      <li class="details">
-        <h1>Country: {{ locationDetails.country }}</h1>
-        <h1>Population: {{ locationDetails.population }}</h1>
-      </li>
-    </template>
+    <li
+      ref="li"
+      v-show="inputValue"
+      v-for="num in 4"
+      :key="num"
+      @click="fetchData(returnValues[num])"
+      class="value"
+    ></li>
+
+    <li class="details" v-if="!inputValue && locationDetails.country">
+      <h1>Country: {{ locationDetails.country }}</h1>
+      <h1>Population: {{ locationDetails.population }}</h1>
+    </li>
   </ul>
 </template>
 
@@ -20,7 +20,14 @@
   /* eslint-disable */
   import Vue from "vue";
   import { locations } from "../assets/functions/functions";
-  import { reactive, toRefs, watch, inject } from "@vue/composition-api";
+  import {
+    reactive,
+    toRefs,
+    watch,
+    inject,
+    ref,
+    computed,
+  } from "@vue/composition-api";
   import { IProps } from "../assets/types/types";
 
   export default Vue.extend({
@@ -32,6 +39,8 @@
         displayValues: [],
       });
 
+      const li = ref<HTMLLIElement[]>();
+
       (async () => {
         state.places = await locations();
       })();
@@ -41,19 +50,21 @@
       watch(
         () => props.inputValue,
         newValue => {
-          const wrapper = document.getElementsByClassName("value");
-          for (let i = 0; i < wrapper.length; i++) {
-            wrapper[i].innerHTML = "";
+          if (li.value === undefined) return;
+          for (let i = 0; i < li.value.length; i++) {
+            li.value[i].innerHTML = "";
           }
           const locationSuggestion = state.places
-            .filter((val: string) =>
-              val.toLowerCase().startsWith(newValue.toLowerCase())
+            .filter((place: string) =>
+              place.toLowerCase().startsWith(newValue.toLowerCase())
             )
             .sort((a: string, b: string) => (a > b ? 1 : -1))
             .slice(0, 5);
+
           state.returnValues = locationSuggestion;
-          const filteredPlaces = locationSuggestion.map((val: string) => {
-            return val
+
+          const filteredPlaces = locationSuggestion.map((location: string) => {
+            return location
               .toLowerCase()
               ?.replaceAll(
                 newValue.toLowerCase(),
@@ -61,16 +72,12 @@
               );
           });
 
-          state.displayValues = filteredPlaces.map((val: string) => {
-            var parser = new DOMParser();
-            let doc = parser.parseFromString(val, "text/html");
-            return doc.body;
+          filteredPlaces.forEach((place: string, i: number) => {
+            if (props.inputValue && li.value)
+              li.value[i] && (li.value[i].innerHTML = place);
           });
-          state.displayValues.forEach((val: Document, i: number) => {
-            if (props.inputValue)
-              document.getElementsByClassName("value")[i].appendChild(val);
-          });
-        }
+        },
+        { immediate: true }
       );
       const fetchData = (payload: string) => {
         emit("fetch", payload);
@@ -80,6 +87,7 @@
         ...toRefs(state),
         fetchData,
         locationDetails,
+        li,
       };
     },
   });

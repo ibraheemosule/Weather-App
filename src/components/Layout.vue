@@ -181,6 +181,8 @@
               break;
             case "Snow":
               state.image = newValue;
+            case "Sunshine":
+              state.image = newValue;
               break;
             case "Clear":
               state.image = newValue;

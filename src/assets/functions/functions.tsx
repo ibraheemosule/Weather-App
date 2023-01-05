@@ -12,9 +12,11 @@ export const getPosition: PositionCallback = async (
       `https://us1.locationiq.com/v1/reverse.php?key=${process.env.VUE_APP_MAP_KEY}&lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`
     );
 
-    const location =
-      data.address.suburb || data.address.county || data.address.city;
-
+    const location = (
+      data.address.suburb ||
+      data.address.county ||
+      data.address.city
+    ).split("/");
     return location[location.length - 1];
   } catch (err) {
     console.error(err);

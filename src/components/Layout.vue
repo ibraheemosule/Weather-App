@@ -198,7 +198,7 @@
       );
 
       const imgUrl = (img: string): string =>
-        require(`@/assets/images/${img}.gif`);
+        require(`@/assets/images/${img}.jpg`);
 
       const activeButton = (e: any): void => {
         const allButtons = document.querySelectorAll(".btn-group button");
@@ -263,7 +263,6 @@
   main {
     height: 100vh;
     padding: 7% 5%;
-    overflow-y: scroll;
     width: 100%;
     max-width: 1340px;
     margin: 0 auto;
@@ -307,6 +306,7 @@
     flex-basis: 60%;
     flex-grow: 1;
     position: relative;
+    background: rgba(0, 0, 0, 0.55);
   }
   .hero .weather {
     position: absolute;
@@ -485,8 +485,8 @@
       display: block;
     }
     section.hero {
-      height: 50vh;
-      margin-bottom: 50px;
+      height: 60vh;
+      padding-bottom: 50px;
     }
     .hero .error {
       margin: 0;

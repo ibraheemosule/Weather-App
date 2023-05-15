@@ -5,7 +5,7 @@
       v-show="inputValue"
       v-for="num in 4"
       :key="num"
-      @click="fetchData(returnValues[num])"
+      @click="fetchData(returnValues[num - 1])"
       class="value"
     ></li>
 
@@ -80,6 +80,7 @@
         { immediate: true }
       );
       const fetchData = (payload: string) => {
+        console.log(payload);
         emit("fetch", payload);
       };
 
